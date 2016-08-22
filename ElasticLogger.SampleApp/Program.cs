@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using log4net;
 using log4net.Config;
 
@@ -24,9 +25,22 @@ namespace ElasticLogger.SampleApp
                     Logger.Info("Running application");
                 }
 
-                ElasticLogger.Instance.LogAsync("soxportal", "event1", new { Timestamp = DateTime.Now, Event = "login", Account = "local", Username = "sox1@timelog.dk" });
-                ElasticLogger.Instance.LogAsync("soxportal", "event2", new { Timestamp = DateTime.Now, Event = "login", Account = "local", Username = "sox2@timelog.dk" });
-                ElasticLogger.Instance.LogAsync("soxportal", "event3", new { Timestamp = DateTime.Now, Event = "login", Account = "local", Username = "sox3@timelog.dk" });
+                using (var logger = new ElasticLogger(true))
+                {
+                    logger.LogAsync("soxportal", "event1", new { Timestamp = DateTime.Now, Event = "login", Account = "local", Username = "sox1@timelog.dk" });
+                    logger.LogAsync("soxportal", "event2", new { Timestamp = DateTime.Now, Event = "login", Account = "local", Username = "sox2@timelog.dk" });
+                    logger.LogAsync("soxportal", "event3", new { Timestamp = DateTime.Now, Event = "login", Account = "local", Username = "sox3@timelog.dk" });
+                    logger.LogAsync("soxportal", "event4", new { Timestamp = DateTime.Now, Event = "login", Account = "local", Username = "sox4@timelog.dk" });
+                    logger.LogAsync("soxportal", "event5", new { Timestamp = DateTime.Now, Event = "login", Account = "local", Username = "sox5@timelog.dk" });
+                    logger.LogAsync("soxportal", "event6", new { Timestamp = DateTime.Now, Event = "login", Account = "local", Username = "sox6@timelog.dk" });
+                    logger.LogAsync("soxportal", "event7", new { Timestamp = DateTime.Now, Event = "login", Account = "local", Username = "sox7@timelog.dk" });
+                    logger.LogAsync("soxportal", "event8", new { Timestamp = DateTime.Now, Event = "login", Account = "local", Username = "sox8@timelog.dk" });
+                    logger.LogAsync("soxportal", "event9", new { Timestamp = DateTime.Now, Event = "login", Account = "local", Username = "sox9@timelog.dk" });
+                    logger.LogAsync("soxportal", "event10", new { Timestamp = DateTime.Now, Event = "login", Account = "local", Username = "sox10@timelog.dk" });
+                    logger.LogAsync("soxportal", "event11", new { Timestamp = DateTime.Now, Event = "login", Account = "local", Username = "sox11@timelog.dk" });
+                    logger.LogAsync("soxportal", "event12", new { Timestamp = DateTime.Now, Event = "login", Account = "local", Username = "sox12@timelog.dk" });
+                    logger.LogAsync("soxportal", "event13", new { Timestamp = DateTime.Now, Event = "login", Account = "local", Username = "sox13@timelog.dk" });
+                }
 
                 if (Logger.IsInfoEnabled)
                 {
