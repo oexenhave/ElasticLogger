@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("ElasticLogger")]
 [assembly: AssemblyDescription("Library that logs dynamic classes to an Elastic Search instance. It may also dump the same bit to a local storage path")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Oexenhave")]
 [assembly: AssemblyProduct("ElasticLogger")]
 [assembly: AssemblyCopyright("Copyright © Oexenhave 2016")]
 [assembly: AssemblyTrademark("")]

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>https://github.com/oexenhave/ElasticLogger/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/oexenhave/ElasticLogger/blob/master/README.md</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>Initial release for this ElasticLogger</releaseNotes>
+    <copyright>MIT License - Copyright (c) 2016 Søren Øxenhave</copyright>
+    <tags>elastic elasticsearch logger</tags>
+    <dependencies>
+      <dependency id="log4net" version="(2.0.5,)" />
+      <dependency id="Newtonsoft.Json" version="(9.0.1,)" />
+    </dependencies>
+  </metadata>
+</package>
