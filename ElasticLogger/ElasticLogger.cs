@@ -21,7 +21,7 @@ namespace ElasticLogger
         private const string AppSettingPrefix = "ElasticLogger.";
         private readonly SemaphoreSlim _flushSemaphore = new SemaphoreSlim(1);
         private static readonly ILog Logger = LogManager.GetLogger(typeof(ElasticLogger));
-        private static readonly DirectoryInfo AppPath = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
+        private static readonly DirectoryInfo AppPath = new FileInfo(AppDomain.CurrentDomain.BaseDirectory).Directory;
 
         /// <summary>
         /// Gets or sets a value indicating whether to automatically flush the cache when the hitting 
@@ -272,6 +272,11 @@ namespace ElasticLogger
         {
             await Task.Factory.StartNew(() =>
             {
+                if (!this.FileLogPath.Exists)
+                {
+                    this.FileLogPath.Create();
+                }
+
                 foreach (var item in items)
                 {
                     File.AppendAllText(
@@ -294,6 +299,7 @@ namespace ElasticLogger
 
                 // ReSharper disable once UnusedVariable
                 var flushAsync = this.FlushAsync();
+                flushAsync.Wait(1000);
             }
         }
     }

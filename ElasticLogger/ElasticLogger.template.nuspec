@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <package>
   <metadata>
     <id>$id$</id>
@@ -10,7 +10,7 @@
     <projectUrl>https://github.com/oexenhave/ElasticLogger/blob/master/README.md</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Proper dispose action and auto creation of file log folder</releaseNotes>
+    <releaseNotes>Initial release for this ElasticLogger</releaseNotes>
     <copyright>MIT License - Copyright (c) 2016 Søren Øxenhave</copyright>
     <tags>elastic elasticsearch logger</tags>
     <dependencies>

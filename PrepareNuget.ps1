@@ -1,3 +1,15 @@
+# Nicely format XML output
+Function Elastic-Format-XML($xml)
+{
+  $Doc = New-Object System.Xml.XmlDocument 
+  $doc.LoadXml($xml)
+  $sw = New-Object System.IO.StringWriter 
+  $writer = New-Object System.Xml.XmlTextWriter($sw) 
+  $writer.Formatting = [System.Xml.Formatting]::Indented 
+  $doc.WriteContentTo($writer) 
+  return $sw.ToString() 
+}
+
 # Credit to https://dzone.com/articles/using-powershell-publish-nuget
 
 $packageName = "ElasticLogger"
@@ -25,6 +37,15 @@ else
 
 Write-Host $newVersion
 
+$releaseNotes = Read-Host -Prompt 'Input release notes'
+
+[xml]$xmlpublish = Get-Content "ElasticLogger\ElasticLogger.template.nuspec" -Encoding UTF8
+$xmlpublish.package.metadata.releaseNotes = $releaseNotes.ToString()
+$xmlOutput = Elastic-Format-XML($xmlpublish.OuterXml.ToString())
+Set-Content "ElasticLogger\ElasticLogger.nuspec" $xmlOutput -Encoding UTF8
+
 get-childitem | where {$_.extension -eq ".nupkg"} | foreach ($_) {remove-item $_.fullname}
 nuget pack $projectPath -Version $newVersion -Prop Configuration=Release -IncludeReferencedProjects
 $package = get-childitem | where {$_.extension -eq ".nupkg"}
+
+Remove-Item Function:\Elastic*
