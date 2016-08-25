@@ -4,12 +4,10 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using log4net;
-using Newtonsoft.Json;
 
 namespace ElasticLogger
 {
@@ -55,6 +53,12 @@ namespace ElasticLogger
         public string FileLogDatePattern { get; set; }
 
         /// <summary>
+        /// Gets or sets the date format to append to all index names. E.g. "-yyyyMMdd" will turn index "portal" into "portal-20160825".
+        /// This is used to allow easy clean up of old entries in Elastic Search. Default is none.
+        /// </summary>
+        public string IndexAppendDateFormat { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether this logger is enabled (both Elastic and file)
         /// </summary>
         public bool IsEnabled { get; set; }
@@ -85,6 +89,7 @@ namespace ElasticLogger
             this.ElasticServer = null;
             this.FileLogDatePattern = "yyyyMMdd";
             this.FileLogPath = new DirectoryInfo(AppPath + "\\Storage");
+            this.IndexAppendDateFormat = string.Empty;
             this.IsEnabled = true;
             this.IsDebugLog4NetEnabled = false;
             this.IsLogToFileEnabled = false;
@@ -117,6 +122,11 @@ namespace ElasticLogger
                     this.FileLogPath = new DirectoryInfo(ConfigurationManager.AppSettings[AppSettingPrefix + "FileLogPath"]);
                 }
 
+                if (!string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings[AppSettingPrefix + "IndexAppendDateFormat"]))
+                {
+                    this.IndexAppendDateFormat = ConfigurationManager.AppSettings[AppSettingPrefix + "IndexAppendDateFormat"];
+                }
+
                 if (!string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings[AppSettingPrefix + "IsEnabled"]))
                 {
                     this.IsEnabled = ConfigurationManager.AppSettings[AppSettingPrefix + "IsEnabled"] == "1";
@@ -141,32 +151,35 @@ namespace ElasticLogger
                 return;
             }
 
+            var item = new ElasticLoggerItem {Index = index, Type = type, Object = obj };
+            await LogAsync(item);
+        }
+
+        public async Task LogAsync(ElasticLoggerItem item)
+        {
+            if (!this.IsEnabled)
+            {
+                return;
+            }
+
             try
             {
-                // Serialize
-                var serializerTask = Task.Factory.StartNew(() => JsonConvert.SerializeObject(obj) + Environment.NewLine);
-                string json = await serializerTask;
+                this.Items.Add(item);
                 if (this.IsDebugLog4NetEnabled && Logger.IsDebugEnabled)
                 {
-                    Logger.Debug("[" + type + "] Serialized");
+                    Logger.Debug("[" + item.Type + "] Added to queue");
                 }
 
-                this.Items.Add(new ElasticLoggerItem { Index = index, Type = type, Json = json });
                 if (this.Items.Count >= this.BufferSize && this.AutoFlush)
                 {
                     await FlushAsync();
-                }
-
-                if (this.IsDebugLog4NetEnabled && Logger.IsDebugEnabled)
-                {
-                    Logger.Debug("[" + type + "] Done");
                 }
             }
             catch (Exception exception)
             {
                 if (Logger.IsErrorEnabled)
                 {
-                    Logger.Error("[" + type + "] Failed to log", exception);
+                    Logger.Error("[" + item.Type + "] Failed to log", exception);
                 }
 
                 // ignored
@@ -240,7 +253,7 @@ namespace ElasticLogger
             string json = string.Empty;
             foreach (var item in items)
             {
-                json += item.ToString("\n");
+                json += item.ToString("\n", this.IndexAppendDateFormat);
             }
 
             if (string.IsNullOrWhiteSpace(json))
@@ -282,7 +295,7 @@ namespace ElasticLogger
                     File.AppendAllText(
                         this.FileLogPath + "\\" +
                         DateTime.Now.ToString(this.FileLogDatePattern) +
-                        " ElasticLogger " + item.Index + " " + item.Type + ".json", item.ToString("\r\n"),
+                        " ElasticLogger " + item.Index + " " + item.Type + ".json", item.ToString("\r\n", this.IndexAppendDateFormat),
                         Encoding.UTF8);
                 }
             });
